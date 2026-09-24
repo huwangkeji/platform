@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>应用分发中心 - 官方应用发布与升级分发平台</title>
+<meta name="description" content="官方应用下载中心，提供 Android、Windows、macOS、Linux 全平台应用安装包下载、版本管理与自动升级服务">
+<link rel="stylesheet" href="/static/css/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-logo">⬇</span>
+      <span class="brand-name">应用分发中心</span>
+    </a>
+    <nav class="nav">
+      <a href="/" class="active">首页</a>
+      <a href="/developer">开发接入</a>
+      <a href="/about">关于程序</a>
+      <a href="/admin" target="_blank" rel="noopener" class="btn-primary-nav">管理后台</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">🛡 官方渠道 · 全平台 · 安全分发</div>
+    <h1>官方应用发布与升级分发平台</h1>
+    <p class="hero-desc">安全稳定的应用下载通道，支持 Android / Windows / macOS / Linux 全平台</p>
+    <div class="hero-platforms">
+      <span class="plat" title="HarmonyOS"><span class="plat-icon">🌐</span>HarmonyOS</span>
+      <span class="plat" title="Android"><span class="plat-icon">🤖</span>Android</span>
+      <span class="plat" title="iOS"><span class="plat-icon">🍎</span>iOS</span>
+      <span class="plat" title="Windows"><span class="plat-icon">🪟</span>Windows</span>
+      <span class="plat" title="macOS"><span class="plat-icon">🖥️</span>macOS</span>
+      <span class="plat" title="Linux"><span class="plat-icon">🐧</span>Linux</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hs-item"><div class="hs-num" id="stat-apps">—</div><div class="hs-label">在架应用</div></div>
+      <div class="hs-item"><div class="hs-num">5</div><div class="hs-label">支持平台</div></div>
+      <div class="hs-item"><div class="hs-num">7×24</div><div class="hs-label">持续服务</div></div>
+    </div>
+  </section>
+
+  <!-- 核心能力 -->
+  <section class="features-section">
+    <div class="section-head">
+      <h2 class="section-title">核心能力</h2>
+      <span class="section-desc">覆盖应用全生命周期的发布与分发</span>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">智能更新检测</div>
+        <div class="feature-desc">自动识别设备平台、架构、渠道与灰度规则，精准推送可用版本</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">灰度发布</div>
+        <div class="feature-desc">按百分比、设备、用户或渠道维度精准投放，支持一键全量与回滚</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">渠道分发与统计</div>
+        <div class="feature-desc">多渠道二维码下载，实时追踪各渠道下载量、升级转化与设备分布</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🐞</div>
+        <div class="feature-title">崩溃监控与工单</div>
+        <div class="feature-desc">APP 异常自动上报，生成工单闭环处理，关联修复版本追踪</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 应用列表 -->
+  <section class="apps-section">
+    <div class="section-head">
+      <h2 class="section-title">全部应用</h2>
+      <span class="section-desc" id="apps-count"></span>
+    </div>
+    <div id="app-list" class="app-grid">
+      <div class="loading">加载中…</div>
+    </div>
+  </section>
+
+  <!-- 开发接入 -->
+  <section class="sdk-section" id="sdk">
+    <div class="section-head">
+      <h2 class="section-title">开发接入</h2>
+      <span class="section-desc">标准 HTTP 接口 · 零 SDK 依赖 · 按 app_code 接入</span>
+    </div>
+    <div class="sdk-grid">
+      <div class="sdk-card">
+        <div class="sdk-card-icon">⚡</div>
+        <div class="sdk-card-title">更新检测</div>
+        <div class="sdk-card-desc">一行代码检查新版本，自动适配平台与渠道</div>
+      </div>
+      <div class="sdk-card">
+        <div class="sdk-card-icon">⬇️</div>
+        <div class="sdk-card-title">安装包下载</div>
+        <div class="sdk-card-desc">支持直链、Nginx 加速与 X-Accel-Redirect 三种模式</div>
+      </div>
+      <div class="sdk-card">
+        <div class="sdk-card-icon">💬</div>
+        <div class="sdk-card-title">用户反馈</div>
+        <div class="sdk-card-desc">自动生成工单号，支持截图附件与设备信息上报</div>
+      </div>
+      <div class="sdk-card">
+        <div class="sdk-card-icon">🐞</div>
+        <div class="sdk-card-title">崩溃上报</div>
+        <div class="sdk-card-desc">捕获未处理异常，自动上传堆栈与环境信息</div>
+      </div>
+    </div>
+    <div class="sdk-cta">
+      <a class="btn-primary" href="/developer">查看完整接入文档 →</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="brand-logo" style="width:28px;height:28px;font-size:14px;">⬇</span>
+      <span>应用分发中心</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">首页</a>
+      <a href="/developer">开发接入</a>
+      <a href="/admin" target="_blank" rel="noopener">管理后台</a>
+    </div>
+    <div class="footer-copy">© 2026 沧州虎王科技 · 应用分发中心 V1.0</div>
+  </div>
+</footer>
+
+<script>
+async function loadApps() {
+  try {
+    const res = await fetch('/api/v1/app/list');
+    const json = await res.json();
+    if (json.code !== 0) throw new Error(json.message || '加载失败');
+    const apps = json.data || [];
+    const box = document.getElementById('app-list');
+    const statEl = document.getElementById('stat-apps');
+    const countEl = document.getElementById('apps-count');
+    if (statEl) statEl.textContent = apps.length;
+    if (countEl) countEl.textContent = '共 ' + apps.length + ' 个应用';
+    if (!apps.length) {
+      box.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          <div class="empty-title">暂无在架应用</div>
+          <div class="empty-desc">前往管理后台创建应用并上传安装包，即可在此展示下载入口</div>
+          <a class="btn-primary" href="/admin" target="_blank">前往管理后台 →</a>
+        </div>`;
+      return;
+    }
+    box.innerHTML = apps.map(a => `
+      <a class="app-card" href="/app/${encodeURIComponent(a.code)}">
+        <div class="app-icon">${a.icon ? `<img src="${escapeHtml(a.icon)}" alt="">` : '📱'}</div>
+        <div class="app-info">
+          <div class="app-name">${escapeHtml(a.name)}</div>
+          <div class="app-code">${escapeHtml(a.code)}</div>
+          <div class="app-desc">${escapeHtml(a.description || '暂无简介')}</div>
+          <div class="app-meta">
+            ${a.latest_version ? `<span class="tag">最新 ${escapeHtml(a.latest_version)}</span>` : '<span class="tag gray">暂未发布</span>'}
+            ${a.published_at ? `<span class="date">${escapeHtml(a.published_at.slice(0, 10))}</span>` : ''}
+          </div>
+        </div>
+        <div class="app-action">下载</div>
+      </a>`).join('');
+  } catch (e) {
+    document.getElementById('app-list').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">加载失败</div><div class="empty-desc">${escapeHtml(e.message)}</div></div>`;
+  }
+}
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+loadApps();
+</script>
+</body>
+</html>

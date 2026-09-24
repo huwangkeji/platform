@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>下载 - {{app_code}}</title>
+<meta name="description" content="官方应用下载与升级页面">
+<link rel="stylesheet" href="/static/css/site.css">
+<style>
+  /* 语言切换器 */
+  .lang-switch { display: flex; align-items: center; gap: 4px; }
+  .lang-switch select {
+    background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.2);
+    border-radius: 4px; padding: 4px 8px; font-size: 13px; cursor: pointer; outline: none;
+  }
+  .lang-switch select option { color: #1d2839; background: #fff; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-logo">⬇</span>
+      <span class="brand-name" data-i18n="brand">应用分发中心</span>
+    </a>
+    <nav class="nav">
+      <a href="/" data-i18n="nav_home">首页</a>
+      <a href="/{{app_code}}/history" id="nav-history" data-i18n="nav_history">历史版本</a>
+      <a href="/about" data-i18n="nav_about">关于程序</a>
+      <a href="#install-guide" class="nav-hide-mobile" data-i18n="nav_guide">安装指南</a>
+      <a href="/admin" target="_blank" rel="noopener" class="btn-ghost" data-i18n="nav_admin">管理后台</a>
+      <div class="lang-switch">
+        <select id="lang-select" onchange="AppI18n.set(this.value)">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="ru">Русский</option>
+          <option value="pt">Português</option>
+          <option value="ar">العربية</option>
+        </select>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="download-main">
+    <div class="app-head">
+      <div id="app-icon" class="app-icon large">📱</div>
+      <div class="app-head-info">
+        <h1 id="app-name">…</h1>
+        <div class="app-code" id="app-code"></div>
+        <p id="app-desc" class="app-desc"></p>
+      </div>
+    </div>
+
+    <div class="notice-box" id="notice-box" style="display:none"></div>
+
+    <div class="download-card">
+      <div class="dl-row">
+        <div class="dl-info">
+          <div class="dl-version"><span data-i18n="latest_ver">最新版本</span> <strong id="ver-name">—</strong></div>
+          <div class="dl-meta">
+            <span id="ver-date">—</span>
+            <span id="ver-size">—</span>
+            <span id="ver-platform" class="tag"></span>
+          </div>
+        </div>
+        <a id="dl-btn" class="btn-primary" href="javascript:;" data-i18n="get_link">获取下载链接</a>
+      </div>
+      <div class="dl-notes" id="dl-notes">
+        <div class="notes-title" data-i18n="release_notes">更新说明</div>
+        <div id="ver-note" class="notes-body">—</div>
+      </div>
+    </div>
+
+    <div class="qr-section">
+      <h3 data-i18n="scan_qr">手机扫码下载</h3>
+      <p class="qr-tip" data-i18n="scan_tip">使用手机扫描二维码即可下载安装包</p>
+      <div class="qr-switch">
+        <button class="qr-tab active" data-type="official" data-i18n="qr_official">官方下载</button>
+        <button class="qr-tab" data-type="version" data-i18n="qr_version">当前版本</button>
+        <button class="qr-tab" data-type="channel" data-i18n="qr_channel">渠道版</button>
+      </div>
+      <div id="qrcode" class="qrcode-box"></div>
+      <p id="qr-label" class="qr-label"></p>
+    </div>
+
+    <div class="links-row">
+      <a href="/{{app_code}}/history" class="link-plain">📜 <span data-i18n="view_history">查看历史版本</span></a>
+      <a href="#" id="privacy-link" class="link-plain" style="display:none" target="_blank" rel="noopener" data-i18n="privacy">隐私政策</a>
+      <a href="#" id="agreement-link" class="link-plain" style="display:none" target="_blank" rel="noopener" data-i18n="agreement">用户协议</a>
+    </div>
+
+    <div class="sdk-section" id="install-guide">
+      <div class="section-head">
+        <h2 class="section-title" data-i18n="install_title">安装与安全提示</h2>
+      </div>
+      <div class="sdk-grid">
+        <div class="sdk-card">
+          <h4><span class="sdk-ico">🛡</span><span data-i18n="install_official">官方渠道</span></h4>
+          <p data-i18n="install_official_desc">本页面及历史版本一律通过平台官方渠道发布，安装包经数字校验（MD5 / SHA1 / SHA256）核验后上架，请勿从第三方站点下载安装包。</p>
+          <span class="endpoint">/download/{version_id}</span>
+        </div>
+        <div class="sdk-card">
+          <h4><span class="sdk-ico green">🔁</span><span data-i18n="install_auto">自动升级</span></h4>
+          <p data-i18n="install_auto_desc">App 内集成本平台更新检测接口后，可自动发现最新版本并提示升级，支持全量 / 灰度发布与强制升级策略。</p>
+          <span class="endpoint">/api/v1/app/update/check</span>
+        </div>
+        <div class="sdk-card">
+          <h4><span class="sdk-ico amber">⚠</span><span data-i18n="install_beware">谨防捆绑</span></h4>
+          <p data-i18n="install_beware_desc">下载后请核对版本号、平台与文件哈希是否与页面展示一致；发现异常请通过 App 内反馈或工单通道联系我们。</p>
+          <span class="endpoint">/api/v1/feedback/create</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 <span data-i18n="company">沧州虎王科技</span> · <span data-i18n="product">应用分发中心</span> · <span data-i18n="footer_tip">请从官方渠道下载应用，谨防第三方盗版与恶意捆绑</span> · <a href="/app/{{app_code}}/history" style="display:none" id="footer-history" data-i18n="footer_history">历史版本</a></p>
+  </div>
+</footer>
+
+<script src="/static/js/qrcode.min.js"></script>
+<script>
+/* ========== i18n 语言包 ========== */
+var I18N = {
+  zh: {
+    brand: '应用分发中心',     nav_home: '首页', nav_history: '历史版本', nav_about: '关于程序', nav_guide: '安装指南', nav_admin: '管理后台',
+    latest_ver: '最新版本', get_link: '获取下载链接', release_notes: '更新说明',
+    scan_qr: '手机扫码下载', scan_tip: '使用手机扫描二维码即可下载安装包',
+    qr_official: '官方下载', qr_version: '当前版本', qr_channel: '渠道版',
+    view_history: '查看历史版本', privacy: '隐私政策', agreement: '用户协议',
+    install_title: '安装与安全提示', install_official: '官方渠道',
+    install_official_desc: '本页面及历史版本一律通过平台官方渠道发布，安装包经数字校验（MD5 / SHA1 / SHA256）核验后上架，请勿从第三方站点下载安装包。',
+    install_auto: '自动升级', install_auto_desc: 'App 内集成本平台更新检测接口后，可自动发现最新版本并提示升级，支持全量 / 灰度发布与强制升级策略。',
+    install_beware: '谨防捆绑', install_beware_desc: '下载后请核对版本号、平台与文件哈希是否与页面展示一致；发现异常请通过 App 内反馈或工单通道联系我们。',
+    company: '沧州虎王科技', product: '应用分发中心',
+    footer_tip: '请从官方渠道下载应用，谨防第三方盗版与恶意捆绑',
+    footer_history: '历史版本', no_version: '暂无可用版本', no_download: '暂无下载', load_fail: '页面加载失败'
+  },
+  en: {
+    brand: 'App Distribution Center', nav_home: 'Home', nav_history: 'History', nav_about: 'About', nav_guide: 'Install Guide', nav_admin: 'Admin',
+    latest_ver: 'Latest', get_link: 'Get Download Link', release_notes: 'Release Notes',
+    scan_qr: 'Scan to Download', scan_tip: 'Scan the QR code with your phone to download the package',
+    qr_official: 'Official', qr_version: 'This Version', qr_channel: 'Channel',
+    view_history: 'View History', privacy: 'Privacy Policy', agreement: 'User Agreement',
+    install_title: 'Installation & Security', install_official: 'Official Channel',
+    install_official_desc: 'All packages on this page are released through official channels, verified by MD5/SHA1/SHA256. Do not download from third-party sites.',
+    install_auto: 'Auto Update', install_auto_desc: 'Integrate our update-check API to automatically discover new versions with support for full/gray/forced upgrades.',
+    install_beware: 'Beware of Bundling', install_beware_desc: 'After downloading, verify the version, platform, and file hash match what is shown on this page. Report anomalies via in-app feedback.',
+    company: 'Cangzhou Huwang Tech', product: 'App Distribution Center',
+    footer_tip: 'Download from official channels only. Beware of piracy and malicious bundling.',
+    footer_history: 'History', no_version: 'No version available', no_download: 'No download', load_fail: 'Failed to load'
+  },
+  ja: {
+    brand: 'アプリ配信センター', nav_home: 'ホーム', nav_history: '履歴', nav_about: 'プログラムについて', nav_guide: 'インストールガイド', nav_admin: '管理画面',
+    latest_ver: '最新バージョン', get_link: 'ダウンロードリンク取得', release_notes: 'リリースノート',
+    scan_qr: 'QRコードでダウンロード', scan_tip: '携帯電話でQRコードをスキャンしてパッケージをダウンロードします',
+    qr_official: '公式', qr_version: '現在のバージョン', qr_channel: 'チャンネル版',
+    view_history: '履歴を見る', privacy: 'プライバシーポリシー', agreement: '利用規約',
+    install_title: 'インストールとセキュリティ', install_official: '公式チャンネル',
+    install_official_desc: '本ページのパッケージはすべて公式チャンネルからリリースされ、MD5/SHA1/SHA256で検証済みです。第三者サイトからのダウンロードは避けてください。',
+    install_auto: '自動アップデート', install_auto_desc: '更新検出APIを統合すると、最新バージョンを自動検出し、フル/グレー/強制アップグレードをサポートします。',
+    install_beware: '不正バンドルに注意', install_beware_desc: 'ダウンロード後、バージョン、プラットフォーム、ファイルハッシュが表示と一致することを確認してください。異常があればアプリ内フィードバックからお知らせください。',
+    company: '滄州虎王科技', product: 'アプリ配信センター',
+    footer_tip: '公式チャンネルからのみダウンロードしてください。海賊版や悪意のあるバンドルにご注意ください。',
+    footer_history: '履歴', no_version: '利用可能なバージョンがありません', no_download: 'ダウンロードなし', load_fail: '読み込みに失敗しました'
+  },
+  ko: {
+    brand: '앱 배포 센터', nav_home: '홈', nav_history: '히스토리', nav_about: '프로그램 정보', nav_guide: '설치 가이드', nav_admin: '관리자',
+    latest_ver: '최신 버전', get_link: '다운로드 링크 받기', release_notes: '업데이트 내역',
+    scan_qr: 'QR 코드로 다운로드', scan_tip: '휴대폰으로 QR 코드를 스캔하여 패키지를 다운로드하세요',
+    qr_official: '공식', qr_version: '현재 버전', qr_channel: '채널판',
+    view_history: '히스토리 보기', privacy: '개인정보 처리방침', agreement: '사용자 동의',
+    install_title: '설치 및 보안 안내', install_official: '공식 채널',
+    install_official_desc: '본 페이지의 패키지는 공식 채널을 통해 배포되며 MD5/SHA1/SHA256으로 검증되었습니다. 제3자 사이트에서 다운로드하지 마세요.',
+    install_auto: '자동 업데이트', install_auto_desc: '업데이트 확인 API를 통합하면 최신 버전을 자동으로 감지하고 전체/그레이/강제 업그레이드를 지원합니다.',
+    install_beware: '바인딩 주의', install_beware_desc: '다운로드 후 버전, 플랫폼, 파일 해시가 페이지에 표시된 내용과 일치하는지 확인하세요. 이상이 있으면 앱 내 피드백으로 알려주세요.',
+    company: '창저우 후왕 기술', product: '앱 배포 센터',
+    footer_tip: '공식 채널에서만 다운로드하세요. 해적판 및 악성 바인딩에 주의하세요.',
+    footer_history: '히스토리', no_version: '사용 가능한 버전 없음', no_download: '다운로드 없음', load_fail: '로드 실패'
+  },
+  es: {
+    brand: 'Centro de Distribución', nav_home: 'Inicio', nav_history: 'Historial', nav_about: 'Acerca del Programa', nav_guide: 'Guía de Instalación', nav_admin: 'Admin',
+    latest_ver: 'Última Versión', get_link: 'Obtener Enlace', release_notes: 'Notas de la Versión',
+    scan_qr: 'Escanear para Descargar', scan_tip: 'Escanea el código QR con tu teléfono para descargar el paquete',
+    qr_official: 'Oficial', qr_version: 'Esta Versión', qr_channel: 'Canal',
+    view_history: 'Ver Historial', privacy: 'Política de Privacidad', agreement: 'Acuerdo de Usuario',
+    install_title: 'Instalación y Seguridad', install_official: 'Canal Oficial',
+    install_official_desc: 'Todos los paquetes de esta página se distribuyen a través de canales oficiales y están verificados con MD5/SHA1/SHA256. No descargues de sitios de terceros.',
+    install_auto: 'Actualización Automática', install_auto_desc: 'Integra nuestra API de verificación de actualizaciones para descubrir automáticamente nuevas versiones con soporte para actualizaciones completas/grises/forzadas.',
+    install_beware: 'Cuidado con el Bundling', install_beware_desc: 'Después de descargar, verifica que la versión, plataforma y hash del archivo coincidan con lo mostrado en esta página. Informa anomalías a través de los comentarios de la aplicación.',
+    company: 'Cangzhou Huwang Tech', product: 'Centro de Distribución',
+    footer_tip: 'Descarga solo desde canales oficiales. Cuidado con la piratería y el bundling malicioso.',
+    footer_history: 'Historial', no_version: 'No hay versión disponible', no_download: 'Sin descarga', load_fail: 'Error al cargar'
+  },
+  fr: {
+    brand: 'Centre de Distribution', nav_home: 'Accueil', nav_history: 'Historique', nav_about: 'À Propos', nav_guide: "Guide d'Installation", nav_admin: 'Admin',
+    latest_ver: 'Dernière Version', get_link: "Obtenir le Lien", release_notes: 'Notes de Version',
+    scan_qr: 'Scanner pour Télécharger', scan_tip: 'Scannez le code QR avec votre téléphone pour télécharger le paquet',
+    qr_official: 'Officiel', qr_version: 'Cette Version', qr_channel: 'Canal',
+    view_history: "Voir l'Historique", privacy: 'Politique de Confidentialité', agreement: "Accord d'Utilisation",
+    install_title: 'Installation et Sécurité', install_official: 'Canal Officiel',
+    install_official_desc: 'Tous les paquets de cette page sont distribués via des canaux officiels et vérifiés par MD5/SHA1/SHA256. Ne téléchargez pas depuis des sites tiers.',
+    install_auto: 'Mise à Jour Automatique', install_auto_desc: "Intégrez notre API de vérification de mise à jour pour découvrir automatiquement les nouvelles versions avec prise en charge des mises à jour complètes/grises/forcées.",
+    install_beware: 'Attention au Bundling', install_beware_desc: "Après le téléchargement, vérifiez que la version, la plateforme et le hash du fichier correspondent à ce qui est affiché sur cette page. Signalez les anomalies via les commentaires de l'application.",
+    company: 'Cangzhou Huwang Tech', product: 'Centre de Distribution',
+    footer_tip: 'Téléchargez uniquement depuis les canaux officiels. Attention au piratage et au bundling malveillant.',
+    footer_history: 'Historique', no_version: 'Aucune version disponible', no_download: 'Pas de téléchargement', load_fail: 'Échec du chargement'
+  },
+  de: {
+    brand: 'App-Verteilungszentrum', nav_home: 'Startseite', nav_history: 'Verlauf', nav_about: 'Über das Programm', nav_guide: 'Installationsanleitung', nav_admin: 'Admin',
+    latest_ver: 'Neueste Version', get_link: 'Link Abrufen', release_notes: 'Versionshinweise',
+    scan_qr: 'Zum Herunterladen Scannen', scan_tip: 'Scannen Sie den QR-Code mit Ihrem Telefon, um das Paket herunterzuladen',
+    qr_official: 'Offiziell', qr_version: 'Diese Version', qr_channel: 'Kanal',
+    view_history: 'Verlauf Anzeigen', privacy: 'Datenschutzrichtlinie', agreement: 'Nutzungsvereinbarung',
+    install_title: 'Installation und Sicherheit', install_official: 'Offizieller Kanal',
+    install_official_desc: 'Alle Pakete auf dieser Seite werden über offizielle Kanäle verteilt und mit MD5/SHA1/SHA256 überprüft. Laden Sie nicht von Drittanbieter-Seiten herunter.',
+    install_auto: 'Automatisches Update', install_auto_desc: 'Integrieren Sie unsere Update-Check-API, um automatisch neue Versionen zu entdecken, mit Unterstützung für vollständige/grau/erzwungene Upgrades.',
+    install_beware: 'Vorsicht vor Bundling', install_beware_desc: 'Überprüfen Sie nach dem Herunterladen, ob Version, Plattform und Datei-Hash mit der Anzeige auf dieser Seite übereinstimmen. Melden Sie Anomalien über das In-App-Feedback.',
+    company: 'Cangzhou Huwang Tech', product: 'App-Verteilungszentrum',
+    footer_tip: 'Laden Sie nur über offizielle Kanäle herunter. Vorsicht vor Piraterie und bösartigem Bundling.',
+    footer_history: 'Verlauf', no_version: 'Keine Version verfügbar', no_download: 'Kein Download', load_fail: 'Laden fehlgeschlagen'
+  },
+  ru: {
+    brand: 'Центр Распространения Приложений', nav_home: 'Главная', nav_history: 'История', nav_about: 'О Программе', nav_guide: 'Руководство по Установке', nav_admin: 'Админ',
+    latest_ver: 'Последняя Версия', get_link: 'Получить Ссылку', release_notes: 'Примечания к Версии',
+    scan_qr: 'Сканировать для Загрузки', scan_tip: 'Отсканируйте QR-код телефоном, чтобы загрузить пакет',
+    qr_official: 'Официальный', qr_version: 'Текущая Версия', qr_channel: 'Канал',
+    view_history: 'Посмотреть Историю', privacy: 'Политика Конфиденциальности', agreement: 'Пользовательское Соглашение',
+    install_title: 'Установка и Безопасность', install_official: 'Официальный Канал',
+    install_official_desc: 'Все пакеты на этой странице распространяются через официальные каналы и проверены MD5/SHA1/SHA256. Не загружайте со сторонних сайтов.',
+    install_auto: 'Автообновление', install_auto_desc: 'Интегрируйте наш API проверки обновлений для автоматического обнаружения новых версий с поддержкой полных/серых/принудительных обновлений.',
+    install_beware: 'Остерегайтесь Bundling', install_beware_desc: 'После загрузки проверьте, что версия, платформа и хеш файла соответствуют показанному на этой странице. Сообщайте об аномалиях через внутриигровую обратную связь.',
+    company: 'Cangzhou Huwang Tech', product: 'Центр Распространения Приложений',
+    footer_tip: 'Загружайте только с официальных каналов. Остерегайтесь пиратства и вредоносного bundling.',
+    footer_history: 'История', no_version: 'Нет доступной версии', no_download: 'Нет загрузки', load_fail: 'Ошибка загрузки'
+  },
+  pt: {
+    brand: 'Centro de Distribuição', nav_home: 'Início', nav_history: 'Histórico', nav_about: 'Sobre o Programa', nav_guide: 'Guia de Instalação', nav_admin: 'Admin',
+    latest_ver: 'Versão Mais Recente', get_link: 'Obter Link', release_notes: 'Notas da Versão',
+    scan_qr: 'Escanear para Baixar', scan_tip: 'Escaneie o código QR com seu telefone para baixar o pacote',
+    qr_official: 'Oficial', qr_version: 'Esta Versão', qr_channel: 'Canal',
+    view_history: 'Ver Histórico', privacy: 'Política de Privacidade', agreement: 'Acordo de Usuário',
+    install_title: 'Instalação e Segurança', install_official: 'Canal Oficial',
+    install_official_desc: 'Todos os pacotes desta página são distribuídos por canais oficiais e verificados por MD5/SHA1/SHA256. Não baixe de sites de terceiros.',
+    install_auto: 'Atualização Automática', install_auto_desc: 'Integre nossa API de verificação de atualização para descobrir automaticamente novas versões com suporte para atualizações completas/cinza/forçadas.',
+    install_beware: 'Cuidado com o Bundling', install_beware_desc: 'Após o download, verifique se a versão, plataforma e hash do arquivo correspondem ao exibido nesta página. Informe anomalias via feedback no aplicativo.',
+    company: 'Cangzhou Huwang Tech', product: 'Centro de Distribuição',
+    footer_tip: 'Baixe apenas de canais oficiais. Cuidado com pirataria e bundling malicioso.',
+    footer_history: 'Histórico', no_version: 'Nenhuma versão disponível', no_download: 'Sem download', load_fail: 'Falha ao carregar'
+  },
+  ar: {
+    brand: 'مركز توزيع التطبيقات', nav_home: 'الرئيسية', nav_history: 'السجل', nav_about: 'حول البرنامج', nav_guide: 'دليل التثبيت', nav_admin: 'الإدارة',
+    latest_ver: 'أحدث إصدار', get_link: 'الحصول على الرابط', release_notes: 'ملاحظات الإصدار',
+    scan_qr: 'مسح للتنزيل', scan_tip: 'امسح رمز QR بهاتفك لتنزيل الحزمة',
+    qr_official: 'رسمي', qr_version: 'هذا الإصدار', qr_channel: 'القناة',
+    view_history: 'عرض السجل', privacy: 'سياسة الخصوصية', agreement: 'اتفاقية المستخدم',
+    install_title: 'التثبيت والأمان', install_official: 'القناة الرسمية',
+    install_official_desc: 'جميع الحزم على هذه الصفحة موزعة عبر قنوات رسمية ومُتحقق منها باستخدام MD5/SHA1/SHA256. لا تقم بالتنزيل من مواقع طرف ثالث.',
+    install_auto: 'التحديث التلقائي', install_auto_desc: 'قم بدمج واجهة برمجة التطبيقات الخاصة بنا للتحقق من التحديثات لاكتشاف الإصدارات الجديدة تلقائيًا مع دعم الترقيات الكاملة/الرمادية/الإجبارية.',
+    install_beware: 'احذر من الدمج', install_beware_desc: 'بعد التنزيل، تحقق من أن الإصدار والمنصة وتجزئة الملف تطابق ما هو معروض على هذه الصفحة. أبلغ عن الحالات الشاذة عبر التعليقات داخل التطبيق.',
+    company: 'تشانغتشو هووانغ تك', product: 'مركز توزيع التطبيقات',
+    footer_tip: 'قم بالتنزيل فقط من القنوات الرسمية. احذر من القرصنة والدمج الضار.',
+    footer_history: 'السجل', no_version: 'لا يوجد إصدار متاح', no_download: 'لا يوجد تنزيل', load_fail: 'فشل التحميل'
+  }
+};
+
+var AppI18n = {
+  lang: 'zh',
+  init: function() {
+    var qs = new URLSearchParams(location.search).get('lang');
+    var saved = qs || localStorage.getItem('app_lang') || (navigator.language || 'zh').slice(0, 2);
+    var target = I18N[saved] ? saved : 'zh';
+    this.set(target, false);
+  },
+  set: function(lang, save) {
+    if (!I18N[lang]) lang = 'zh';
+    this.lang = lang;
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+    document.getElementById('lang-select').value = lang;
+    if (save !== false) localStorage.setItem('app_lang', lang);
+    var dict = I18N[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+  },
+  t: function(key) {
+    return I18N[this.lang][key] || I18N['zh'][key] || key;
+  }
+};
+
+/* ========== 原有业务逻辑 ========== */
+var APP_CODE = '{{app_code}}';
+var PLATFORMS = {harmonyos: 'HarmonyOS', android: 'Android', windows: 'Windows', macos: 'macOS', linux: 'Linux', ios: 'iOS'};
+var PLATFORM_ICON = {harmonyos: '🌐', android: '🤖', windows: '🪟', macos: '🍎', linux: '🐧', ios: '📱'};
+var currentPlatform = detectPlatform();
+var appInfo = null, latest = null, qrcodeObj = null;
+var footerHistory = document.getElementById('footer-history');
+document.getElementById('nav-history').textContent = AppI18n.t('nav_history');
+footerHistory && (footerHistory.style.display = '');
+
+function detectPlatform() {
+  var ua = navigator.userAgent.toLowerCase();
+  if (/harmonyos/.test(ua)) return 'harmonyos';
+  if (/android/.test(ua)) return 'android';
+  if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+  if (/windows/.test(ua)) return 'windows';
+  if (/mac os|macintosh/.test(ua)) return 'macos';
+  if (/linux/.test(ua)) return 'linux';
+  return 'android';
+}
+function fmtSize(bytes) {
+  if (!bytes || bytes <= 0) return '';
+  var units = ['B','KB','MB','GB'];
+  var i = 0, n = bytes;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return n.toFixed(i === 0 ? 0 : 1) + ' ' + units[i];
+}
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function api(url) { return fetch(url).then(r => r.json()); }
+
+async function init() {
+  try {
+    var infoRes = await api('/api/v1/app/info?app_code=' + encodeURIComponent(APP_CODE));
+    if (infoRes.code !== 0) { fail(AppI18n.t('load_fail')); return; }
+    appInfo = infoRes.data;
+    document.title = AppI18n.t('get_link') + ' - ' + appInfo.name;
+    document.getElementById('app-name').textContent = appInfo.name;
+    document.getElementById('app-code').textContent = 'App Code：' + appInfo.code;
+    document.getElementById('app-desc').textContent = appInfo.description || '';
+    var iconBox = document.getElementById('app-icon');
+    if (appInfo.icon) { iconBox.innerHTML = '<img src="' + escapeHtml(appInfo.icon) + '" alt="">'; }
+    if (appInfo.privacy_url) { var p = document.getElementById('privacy-link'); p.href = appInfo.privacy_url; p.style.display = ''; }
+    if (appInfo.agreement_url) { var a = document.getElementById('agreement-link'); a.href = appInfo.agreement_url; a.style.display = ''; }
+    loadLatest();
+    loadNotices();
+  } catch (e) { fail(AppI18n.t('load_fail')); }
+}
+
+function loadLatest() {
+  var platform = currentPlatform;
+  api('/api/v1/app/version/latest?app_code=' + encodeURIComponent(APP_CODE) + '&platform=' + platform)
+    .then(function (json) {
+      if (json.code !== 0 || !json.data.has_version) {
+        document.getElementById('ver-name').textContent = AppI18n.t('no_version');
+        document.getElementById('dl-btn').textContent = AppI18n.t('no_download');
+        return;
+      }
+      latest = json.data.version;
+      var platName = PLATFORMS[latest.platform] || latest.platform;
+      document.getElementById('ver-name').textContent = latest.version_name;
+      document.getElementById('ver-date').textContent = (latest.published_at || '').replace('T', ' ').slice(0, 16);
+      var sizeEl = document.getElementById('ver-size');
+      sizeEl.textContent = fmtSize(latest.file_size) ? 'File ' + fmtSize(latest.file_size) : '';
+      document.getElementById('ver-platform').textContent = PLATFORM_ICON[latest.platform] + ' ' + platName;
+      document.getElementById('dl-notes').style.display = latest.release_note ? '' : 'none';
+      document.getElementById('ver-note').textContent = latest.release_note || '';
+      var btn = document.getElementById('dl-btn');
+      btn.textContent = AppI18n.t('get_link') + ' ' + latest.version_name + ' (' + platName + ')';
+      btn.href = latest.download_url + (currentPlatform ? '?platform=' + currentPlatform : '');
+      btn.setAttribute('download', '');
+      renderQR('official');
+    })
+    .catch(function () { document.getElementById('ver-name').textContent = AppI18n.t('load_fail'); });
+}
+
+function loadNotices() {
+  api('/api/v1/notice/list?app_code=' + encodeURIComponent(APP_CODE))
+    .then(function (json) {
+      if (json.code !== 0 || !json.data || !json.data.length) return;
+      var box = document.getElementById('notice-box');
+      box.style.display = '';
+      box.innerHTML = '<strong>📢 ' + (AppI18n.t('brand') || '公告') + '</strong>' + json.data.map(function (n) {
+        return '<div class="notice-item"><span class="notice-title">' + escapeHtml(n.title) + '</span><span class="notice-time">' + escapeHtml((n.created_at || '').slice(0, 10)) + '</span></div>';
+      }).join('');
+    })
+    .catch(function () {});
+}
+
+function currentChannelLabel() {
+  var qs = new URLSearchParams(location.search);
+  return qs.get('channel') || '';
+}
+
+function renderQR(type) {
+  var url = '';
+  var label = '';
+  var channel = currentChannelLabel();
+  if (type === 'official') {
+    url = location.origin + '/app/' + encodeURIComponent(APP_CODE) + (channel ? '?channel=' + channel : '');
+    label = (AppI18n.t('qr_official') || '官方二维码') + '：' + APP_CODE;
+  } else if (type === 'version' && latest) {
+    url = latest.download_url;
+    label = (AppI18n.t('qr_version') || '版本二维码') + '：' + latest.version_name;
+  } else if (type === 'channel') {
+    url = location.origin + '/download/' + encodeURIComponent(APP_CODE) + (channel ? '?channel=' + channel : '?channel=official');
+    label = (AppI18n.t('qr_channel') || '渠道二维码') + '：' + (channel || 'official');
+  } else { return; }
+  var box = document.getElementById('qrcode');
+  box.innerHTML = '';
+  if (qrcodeObj && qrcodeObj.clear) qrcodeObj.clear();
+  qrcodeObj = new QRCode(box, { text: url, width: 168, height: 168, colorDark: '#0f172a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  document.getElementById('qr-label').textContent = label;
+}
+function fail(msg) {
+  document.getElementById('app-name').textContent = msg;
+  document.getElementById('dl-btn').textContent = AppI18n.t('no_download');
+}
+document.addEventListener('DOMContentLoaded', function() { AppI18n.init(); init(); });
+document.querySelector('.qr-switch') && document.querySelector('.qr-switch').addEventListener('click', function (e) {
+  if (!e.target.classList.contains('qr-tab')) return;
+  document.querySelectorAll('.qr-tab').forEach(function (b) { b.classList.remove('active'); });
+  e.target.classList.add('active');
+  renderQR(e.target.dataset.type);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开发接入 - 应用分发中心</title>
+<meta name="description" content="应用分发中心 API 接入文档，涵盖更新检测、安装包下载、用户反馈、崩溃上报四大接口，支持 Android、iOS、Web 接入。">
+<link rel="stylesheet" href="/static/css/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-logo">⬇</span>
+      <span class="brand-name">应用分发中心</span>
+    </a>
+    <nav class="nav">
+      <a href="/">首页</a>
+      <a href="/developer" class="active">开发接入</a>
+      <a href="/about">关于程序</a>
+      <a href="/admin" target="_blank" rel="noopener" class="btn-primary-nav">管理后台</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="dev-hero">
+    <h1>开发接入</h1>
+    <p>应用分发中心向 APP 提供标准 HTTP 接口，覆盖「更新检测、安装包下载、用户反馈、崩溃上报」四大场景。APP 只需按 app_code 接入即可与平台互通，无需额外 SDK 依赖。</p>
+  </section>
+
+  <!-- 快速开始 -->
+  <section class="doc-section">
+    <h2>快速开始</h2>
+    <ol>
+      <li>在<strong>管理后台</strong> → 应用管理中创建应用，获取 <code>app_code</code>（如 <code>kuaidi</code>）。</li>
+      <li>上传安装包并发布版本，配置是否强制升级、灰度规则、最低版本号等。</li>
+      <li>在 APP 启动时调用<strong>更新检测接口</strong>，命中新版本后按 <code>download_url</code> 下载并校验 md5/sha256。</li>
+      <li>需要时调用<strong>反馈/崩溃接口</strong>，自动汇总至后台工单与崩溃日志。</li>
+    </ol>
+  </section>
+
+  <!-- 更新检测 -->
+  <section class="doc-section">
+    <h2>更新检测</h2>
+    <p>APP 启动时调用，携带当前版本号、平台、渠道与设备信息，返回是否需更新及新版本详情。</p>
+
+    <div class="api-card">
+      <span class="api-method get">GET</span>
+      <span class="api-path">/api/v1/app/update/check</span>
+      <p class="api-desc">按 应用 → 版本号 → 平台/架构 → 渠道 → 最低版本 → 灰度规则 → 设备 的决策链判断是否需要升级。</p>
+
+      <h3>请求参数</h3>
+      <table class="param-table">
+        <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+        <tr><td><code>app_code</code></td><td>string</td><td><span class="required">必填</span></td><td>应用唯一编码，管理后台创建应用时分配</td></tr>
+        <tr><td><code>version_code</code></td><td>int</td><td><span class="required">必填</span></td><td>当前版本号（数字，如 100）</td></tr>
+        <tr><td><code>version_name</code></td><td>string</td><td><span class="required">必填</span></td><td>当前版本名（如 1.0.0）</td></tr>
+        <tr><td><code>platform</code></td><td>string</td><td><span class="required">必填</span></td><td>平台：android、ios、windows、macos、linux</td></tr>
+        <tr><td><code>architecture</code></td><td>string</td><td><span class="optional">可选</span></td><td>CPU 架构：arm64-v8a、armeabi-v7a、x86_64、universal 等</td></tr>
+        <tr><td><code>channel</code></td><td>string</td><td><span class="optional">可选</span></td><td>渠道编码，默认 official</td></tr>
+        <tr><td><code>device_id</code></td><td>string</td><td><span class="optional">可选</span></td><td>设备唯一标识，用于灰度与崩溃追踪</td></tr>
+        <tr><td><code>os_version</code></td><td>string</td><td><span class="optional">可选</span></td><td>操作系统版本号</td></tr>
+      </table>
+    </div>
+
+    <h3>响应结构</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="lang-tab active">JSON</span>
+      </div>
+      <pre><code>{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "has_update": true,
+    "version_id": 12,
+    "version_name": "1.1.0",
+    "version_code": 110,
+    "platform": "android",
+    "architecture": "arm64-v8a",
+    "force_update": false,
+    "title": "新版本 1.1.0",
+    "release_note": "修复已知问题，提升稳定性",
+    "file_size": 52428800,
+    "file_name": "your_app_1.1.0.apk",
+    "download_url": "https://your-domain/download/12",
+    "md5": "d41d8cd98f00b204e9800998ecf8427e",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "published_at": "2026-09-20 10:00:00"
+  }
+}</code></pre>
+    </div>
+
+    <h3>示例代码</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="lang-tab active" onclick="switchTab(this,'check-curl')">cURL</span>
+        <span class="lang-tab" onclick="switchTab(this,'check-java')">Java (OkHttp)</span>
+        <span class="lang-tab" onclick="switchTab(this,'check-ios')">iOS (URLSession)</span>
+        <span class="lang-tab" onclick="switchTab(this,'check-js')">JavaScript</span>
+        <button class="copy-btn" onclick="copyActive(this)">📋 复制</button>
+      </div>
+      <pre id="check-curl"><code># 更新检测（GET 请求，参数放在 URL 中）
+curl "https://your-domain/api/v1/app/update/check?app_code=your_app&version_code=100&version_name=1.0.0&platform=android&os_version=13&architecture=arm64-v8a&channel=official&device_id=dev_001"
+
+# 有更新时下载安装包（302 跳转至存储地址）
+curl -L "https://your-domain/download/12" -o your_app_1.1.0.apk
+
+# 校验文件完整性
+md5sum your_app_1.1.0.apk</code></pre>
+      <pre id="check-java" style="display:none"><code>// Android - OkHttp 示例
+OkHttpClient client = new OkHttpClient();
+HttpUrl url = HttpUrl.parse("https://your-domain/api/v1/app/update/check").newBuilder()
+    .addQueryParameter("app_code", "your_app")
+    .addQueryParameter("version_code", "100")
+    .addQueryParameter("version_name", "1.0.0")
+    .addQueryParameter("platform", "android")
+    .addQueryParameter("device_id", Build.SERIAL)
+    .build();
+Request request = new Request.Builder().url(url).build();
+client.newCall(request).enqueue(new Callback() {
+    @Override public void onFailure(Call call, IOException e) { /* 重试/忽略 */ }
+    @Override public void onResponse(Call call, Response response) throws IOException {
+        JSONObject json = new JSONObject(response.body().string());
+        if (json.getInt("code") == 0) {
+            JSONObject data = json.getJSONObject("data");
+            boolean has = data.getBoolean("has_update");
+            // 有新版本时提示用户下载
+        }
+    }
+});</code></pre>
+      <pre id="check-ios" style="display:none"><code>// iOS - URLSession 示例
+let url = URL(string: "https://your-domain/api/v1/app/update/check?app_code=your_app&version_code=100&version_name=1.0.0&platform=ios&device_id=\(UIDevice.current.identifierForVendor?.uuidString ?? "")")!
+let task = URLSession.shared.dataTask(with: url) { data, response, error in
+    guard let data = data else { return }
+    do {
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        if let code = json?["code"] as? Int, code == 0,
+           let dataObj = json?["data"] as? [String: Any],
+           let hasUpdate = dataObj["has_update"] as? Bool, hasUpdate {
+            // 弹出更新提示
+        }
+    } catch { }
+}
+task.resume()</code></pre>
+      <pre id="check-js" style="display:none"><code>// JavaScript / Web 示例
+async function checkUpdate() {
+  const params = new URLSearchParams({
+    app_code: 'your_app',
+    version_code: '100',
+    version_name: '1.0.0',
+    platform: 'web',
+    device_id: 'web_001'
+  });
+  const res = await fetch('/api/v1/app/update/check?' + params.toString());
+  const json = await res.json();
+  if (json.code === 0 && json.data?.has_update) {
+    console.log('有新版本', json.data.version_name, json.data.download_url);
+  }
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 安装包下载 -->
+  <section class="doc-section">
+    <h2>安装包下载</h2>
+    <p>通过版本 ID 或应用编码获取最新安装包，支持渠道分流与二维码下载。</p>
+    <div class="api-card">
+      <span class="api-method get">GET</span>
+      <span class="api-path">/download/{version_id}</span>
+      <p class="api-desc">返回 302 重定向至安全存储地址，同时记录下载日志与渠道统计。</p>
+    </div>
+    <div class="api-card">
+      <span class="api-method get">GET</span>
+      <span class="api-path">/download/{app_code}?channel={channel_code}</span>
+      <p class="api-desc">按应用编码 + 渠道编码获取最新版本，常用于渠道二维码下载。</p>
+    </div>
+    <table class="param-table">
+      <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+      <tr><td><code>version_id</code></td><td>int</td><td><span class="required">必填</span></td><td>版本 ID（更新检测接口返回的 version_id）</td></tr>
+      <tr><td><code>app_code</code></td><td>string</td><td><span class="required">必填</span></td><td>应用唯一编码</td></tr>
+      <tr><td><code>channel</code></td><td>string</td><td><span class="optional">可选</span></td><td>渠道编码，默认 official</td></tr>
+    </table>
+  </section>
+
+  <!-- 用户反馈 -->
+  <section class="doc-section">
+    <h2>用户反馈</h2>
+    <p>提交问题、建议或截图附件，平台自动生成工单流转处理。</p>
+    <div class="api-card">
+      <span class="api-method post">POST</span>
+      <span class="api-path">/api/v1/feedback/create</span>
+      <p class="api-desc">创建反馈并自动生成工单号，限流 20 次/60 秒。</p>
+      <table class="param-table">
+        <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+        <tr><td><code>app_code</code></td><td>string</td><td><span class="required">必填</span></td><td>应用编码</td></tr>
+        <tr><td><code>type</code></td><td>string</td><td><span class="required">必填</span></td><td>类型：bug / suggestion / complaint / other</td></tr>
+        <tr><td><code>title</code></td><td>string</td><td><span class="required">必填</span></td><td>标题</td></tr>
+        <tr><td><code>content</code></td><td>string</td><td><span class="optional">可选</span></td><td>详细描述</td></tr>
+        <tr><td><code>contact</code></td><td>string</td><td><span class="optional">可选</span></td><td>联系方式（邮箱/手机）</td></tr>
+        <tr><td><code>device_id</code></td><td>string</td><td><span class="optional">可选</span></td><td>设备 ID</td></tr>
+        <tr><td><code>app_version</code></td><td>string</td><td><span class="optional">可选</span></td><td>应用版本名</td></tr>
+        <tr><td><code>os_version</code></td><td>string</td><td><span class="optional">可选</span></td><td>操作系统版本</td></tr>
+        <tr><td><code>device_model</code></td><td>string</td><td><span class="optional">可选</span></td><td>设备型号</td></tr>
+        <tr><td><code>channel</code></td><td>string</td><td><span class="optional">可选</span></td><td>渠道编码</td></tr>
+      </table>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="lang-tab active">cURL</span>
+      </div>
+      <pre><code># 提交用户反馈
+curl -X POST "https://your-domain/api/v1/feedback/create" \
+  -d "app_code=your_app&type=bug&title=登录偶发失败&content=在弱网环境下点击登录按钮无响应&contact=user@mail.com&device_id=dev_001&app_version=1.0.0&os_version=13&device_model=Pixel+8&channel=official"
+
+# 返回
+{"code":0,"message":"success","data":{"feedback_id":88,"ticket_no":"BUG-20260923-088"}}</code></pre>
+    </div>
+  </section>
+
+  <!-- 崩溃上报 -->
+  <section class="doc-section">
+    <h2>崩溃上报</h2>
+    <p>APP 捕获未处理异常后上报堆栈与设备环境，帮助研发快速定位线上问题。限流 30 次/60 秒。</p>
+    <div class="api-card">
+      <span class="api-method post">POST</span>
+      <span class="api-path">/api/v1/crash/report</span>
+      <table class="param-table">
+        <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+        <tr><td><code>app_code</code></td><td>string</td><td><span class="required">必填</span></td><td>应用编码</td></tr>
+        <tr><td><code>version_name</code></td><td>string</td><td><span class="required">必填</span></td><td>版本名</td></tr>
+        <tr><td><code>version_code</code></td><td>int</td><td><span class="required">必填</span></td><td>版本号</td></tr>
+        <tr><td><code>device_id</code></td><td>string</td><td><span class="required">必填</span></td><td>设备 ID</td></tr>
+        <tr><td><code>device_model</code></td><td>string</td><td><span class="optional">可选</span></td><td>设备型号</td></tr>
+        <tr><td><code>os_version</code></td><td>string</td><td><span class="optional">可选</span></td><td>系统版本</td></tr>
+        <tr><td><code>error_message</code></td><td>string</td><td><span class="optional">可选</span></td><td>错误摘要</td></tr>
+        <tr><td><code>stack_trace</code></td><td>string</td><td><span class="optional">可选</span></td><td>完整堆栈</td></tr>
+        <tr><td><code>occurred_at</code></td><td>string</td><td><span class="optional">可选</span></td><td>发生时间（格式：2026-09-23 10:00:00）</td></tr>
+      </table>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="lang-tab active">cURL</span>
+      </div>
+      <pre><code># 上报崩溃
+curl -X POST "https://your-domain/api/v1/crash/report" \
+  -d "app_code=your_app&version_name=1.0.0&version_code=100&device_id=dev_001&device_model=Pixel+8&os_version=13&error_message=NullPointerException&stack_trace=at+com.app.Main.onCreate&occurred_at=2026-09-23+10:00:00"
+
+# 返回
+{"code":0,"message":"success"}</code></pre>
+    </div>
+  </section>
+
+  <!-- 其他接口速览 -->
+  <section class="doc-section">
+    <h2>其他接口速览</h2>
+    <table class="param-table">
+      <tr><th>接口</th><th>方法</th><th>路径</th><th>说明</th></tr>
+      <tr><td>应用列表</td><td><span class="api-method get">GET</span></td><td><code>/api/v1/app/list</code></td><td>获取全部启用中的应用列表</td></tr>
+      <tr><td>应用信息</td><td><span class="api-method get">GET</span></td><td><code>/api/v1/app/info?app_code=xxx</code></td><td>获取单个应用详情</td></tr>
+      <tr><td>最新版本</td><td><span class="api-method get">GET</span></td><td><code>/api/v1/app/version/latest?app_code=xxx&platform=android</code></td><td>获取最新版本（不带灰度判断）</td></tr>
+      <tr><td>历史版本</td><td><span class="api-method get">GET</span></td><td><code>/api/v1/app/version/history?app_code=xxx</code></td><td>历史版本分页</td></tr>
+      <tr><td>设备注册</td><td><span class="api-method post">POST</span></td><td><code>/api/v1/device/register</code></td><td>设备首次注册，返回 device_id</td></tr>
+      <tr><td>设备心跳</td><td><span class="api-method post">POST</span></td><td><code>/api/v1/device/heartbeat</code></td><td>更新设备在线状态</td></tr>
+      <tr><td>公告列表</td><td><span class="api-method get">GET</span></td><td><code>/api/v1/notice/list</code></td><td>前台公告列表（按启用状态与时间范围过滤）</td></tr>
+    </table>
+  </section>
+
+  <!-- 错误码表 -->
+  <section class="doc-section">
+    <h2>错误码表</h2>
+    <table class="err-table">
+      <tr><th>code</th><th>含义</th><th>常见场景</th></tr>
+      <tr><td><code>0</code></td><td>成功</td><td>正常返回</td></tr>
+      <tr><td><code>10001</code></td><td>参数缺失</td><td>必填参数未传</td></tr>
+      <tr><td><code>10002</code></td><td>参数格式错误</td><td>数值字段传了非数字</td></tr>
+      <tr><td><code>10003</code></td><td>参数校验失败</td><td>格式正则校验不通过（如 App Code、渠道编码）</td></tr>
+      <tr><td><code>10004</code></td><td>资源已存在</td><td>重复创建（同名应用、重复渠道编码）</td></tr>
+      <tr><td><code>10005</code></td><td>资源不存在或已停用</td><td>查询不到对应记录</td></tr>
+      <tr><td><code>10006</code></td><td>操作失败</td><td>业务逻辑不允许（如删除已发布版本）</td></tr>
+      <tr><td><code>10007</code></td><td>权限不足</td><td>当前角色无对应权限点</td></tr>
+      <tr><td><code>10008</code></td><td>禁止操作</td><td>如禁用自己账号、移除自己超级管理员角色</td></tr>
+      <tr><td><code>401</code></td><td>未登录或登录已失效</td><td>Token 过期或无效</td></tr>
+      <tr><td><code>403</code></td><td>无权限</td><td>RbacCheck 拦截（缺少对应 permission）</td></tr>
+      <tr><td><code>404</code></td><td>接口或资源不存在</td><td>URL 错误或版本/应用不存在</td></tr>
+      <tr><td><code>429</code></td><td>请求过于频繁</td><td>接口限流触发（登录/反馈/上传等）</td></tr>
+      <tr><td><code>500</code></td><td>服务器内部错误</td><td>异常情况，需联系管理员排查</td></tr>
+    </table>
+  </section>
+
+  <!-- 接入流程图 -->
+  <section class="doc-section">
+    <h2>接入流程</h2>
+    <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius);padding:24px;line-height:2;font-size:14px;color:var(--text-sub);">
+      <strong style="color:var(--sky-800)">Step 1</strong> 后台创建应用 → 获取 <code>app_code</code><br>
+      <strong style="color:var(--sky-800)">Step 2</strong> 上传安装包并发布 → 配置灰度/强制更新规则<br>
+      <strong style="color:var(--sky-800)">Step 3</strong> APP 启动调用 <code>/api/v1/app/update/check</code> → 判断是否升级<br>
+      <strong style="color:var(--sky-800)">Step 4</strong> 命中升级 → 按 <code>download_url</code> 下载 → 校验 md5/sha256 → 安装<br>
+      <strong style="color:var(--sky-800)">Step 5</strong> 异常时调用 <code>/api/v1/crash/report</code>，用户反馈调用 <code>/api/v1/feedback/create</code>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 沧州虎王科技 · 应用分发中心 · <a href="/admin" target="_blank" rel="noopener">管理后台</a> · <a href="/">首页</a></p>
+  </div>
+</footer>
+
+<script>
+function switchTab(el, id) {
+  const block = el.closest('.code-block');
+  block.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+  block.querySelectorAll('pre').forEach(p => p.style.display = 'none');
+  el.classList.add('active');
+  document.getElementById(id).style.display = '';
+}
+function copyActive(btn) {
+  const block = btn.closest('.code-block');
+  const activePre = block.querySelector('pre:not([style*="display:none"])') || block.querySelector('pre');
+  const text = activePre.innerText;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ 已复制'; setTimeout(() => btn.textContent = '📋 复制', 1500);
+    });
+  } else {
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent = '✓ 已复制'; setTimeout(() => btn.textContent = '📋 复制', 1500);
+  }
+}
+</script>
+</body>
+</html>

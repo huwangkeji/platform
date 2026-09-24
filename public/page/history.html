@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>历史版本 - {{app_code}}</title>
+<meta name="description" content="历史版本列表，支持按平台筛选">
+<link rel="stylesheet" href="/static/css/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-logo">⬇</span>
+      <span class="brand-name">应用分发中心</span>
+    </a>
+    <nav class="nav">
+      <a href="/">首页</a>
+      <a href="/{{app_code}}" class="active">最新版本</a>
+      <a href="/about">关于程序</a>
+      <a href="/admin" target="_blank" rel="noopener" class="btn-ghost">管理后台</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="history-main">
+    <div class="history-head">
+      <h1 id="app-name">历史版本</h1>
+      <p class="app-desc">仅展示已发布的正式版本，旧版本可能存在已知问题，建议优先使用最新版本</p>
+    </div>
+    <div id="platform-filter" class="filter-row">
+      <button class="filter-tab active" data-platform="">全部平台</button>
+      <button class="filter-tab" data-platform="harmonyos">HarmonyOS</button>
+      <button class="filter-tab" data-platform="android">Android</button>
+      <button class="filter-tab" data-platform="ios">iOS</button>
+      <button class="filter-tab" data-platform="windows">Windows</button>
+      <button class="filter-tab" data-platform="macos">macOS</button>
+      <button class="filter-tab" data-platform="linux">Linux</button>
+    </div>
+    <div id="version-list" class="version-list">
+      <div class="loading">加载中…</div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 沧州虎王科技 · 应用分发中心 · 请从官方渠道下载应用 · <a href="/{{app_code}}">返回最新版本</a></p>
+  </div>
+</footer>
+
+<script>
+var APP_CODE = '{{app_code}}';
+var currentPlatform = '';
+var PAGE = 1;
+var PLATFORM_ICON = {android: '🤖', windows: '🪟', macos: '🍎', linux: '🐧', ios: '📱'};
+var PLATFORM_NAMES = {android: 'Android', windows: 'Windows', macos: 'macOS', linux: 'Linux', ios: 'iOS'};
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtSize(bytes) {
+  if (!bytes || bytes <= 0) return '';
+  var units = ['B','KB','MB','GB'];
+  var i = 0, n = bytes;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return n.toFixed(i === 0 ? 0 : 1) + ' ' + units[i];
+}
+
+async function load() {
+  var url = '/api/v1/app/version/history?app_code=' + encodeURIComponent(APP_CODE) + '&page=' + PAGE + '&page_size=20';
+  if (currentPlatform) url += '&platform=' + currentPlatform;
+  try {
+    var res = await fetch(url);
+    var json = await res.json();
+    if (json.code !== 0) throw new Error(json.message || '加载失败');
+    render(json.data);
+  } catch (e) {
+    document.getElementById('version-list').innerHTML = '<div class="empty">加载失败：' + escapeHtml(e.message) + '</div>';
+  }
+}
+
+function render(data) {
+  var list = data.list || [];
+  var box = document.getElementById('version-list');
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">暂无历史版本</div>';
+    return;
+  }
+  box.innerHTML = list.map(function (v) {
+    var plat = v.platform;
+    return '<div class="version-item">' +
+      '<div class="ver-left">' +
+        '<div class="ver-name">' + (PLATFORM_ICON[plat] || '📦') + ' ' + escapeHtml(v.version_name) +
+          (v.version_code ? ' <span class="ver-code">code ' + escapeHtml(v.version_code) + '</span>' : '') + '</div>' +
+        '<div class="ver-meta">' +
+          (v.published_at ? '<span>更新于 ' + escapeHtml(v.published_at.replace('T', ' ').slice(0, 16)) + '</span>' : '') +
+          (v.file_size ? '<span>' + fmtSize(v.file_size) + '</span>' : '') +
+          '<span class="tag">' + escapeHtml(PLATFORM_NAMES[plat] || plat) + '</span>' +
+        '</div>' +
+        (v.release_title ? '<div class="ver-title">' + escapeHtml(v.release_title) + '</div>' : '') +
+        (v.release_note ? '<pre class="ver-note">' + escapeHtml(v.release_note) + '</pre>' : '') +
+        (v.md5 ? '<div class="ver-hash">MD5：<code>' + escapeHtml(v.md5) + '</code></div>' : '') +
+      '</div>' +
+      '<div class="ver-right"><a class="btn-dl" href="' + escapeHtml(v.download_url) + '" download>下载</a></div>' +
+    '</div>';
+  }).join('');
+}
+
+function bindFilter() {
+  document.getElementById('platform-filter').addEventListener('click', function (e) {
+    var btn = e.target.closest('.filter-tab');
+    if (!btn) return;
+    document.querySelectorAll('.filter-tab').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentPlatform = btn.dataset.platform;
+    PAGE = 1;
+    load();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  bindFilter();
+  load();
+});
+</script>
+</body>
+</html>

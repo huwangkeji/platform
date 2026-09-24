@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于程序 - 应用分发中心</title>
+<meta name="description" content="应用分发中心 —— 沧州虎王科技开发的企业级应用发布与升级分发平台，安全稳定的应用下载通道，支持 Android、Windows、macOS、Linux 全平台">
+<link rel="stylesheet" href="/static/css/site.css">
+<style>
+  /* 关于页面专用扩展样式 */
+  .about-hero {
+    text-align: center; padding: 48px 0 32px;
+  }
+  .about-hero h1 {
+    font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 12px;
+  }
+  .about-hero .about-sub {
+    font-size: 16px; color: var(--text-sub); max-width: 640px; margin: 0 auto; line-height: 1.7;
+  }
+  .about-section {
+    background: var(--card-bg); border-radius: var(--radius); padding: 28px 32px;
+    margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+  .about-section h2 {
+    font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .about-section h2 .sec-ico {
+    width: 32px; height: 32px; border-radius: 6px; background: var(--tc-blue-light);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .about-section p, .about-section li {
+    font-size: 14px; color: var(--text-sub); line-height: 1.8;
+  }
+  .about-section ul { padding-left: 20px; margin: 8px 0; }
+  .about-section li { margin-bottom: 6px; }
+  .feature-grid-about {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 12px;
+  }
+  .feature-card-about {
+    background: var(--bg); border-radius: var(--radius-sm); padding: 18px 16px;
+    border: 1px solid var(--border-light);
+  }
+  .feature-card-about .fc-ico {
+    font-size: 22px; margin-bottom: 8px; display: block;
+  }
+  .feature-card-about .fc-title {
+    font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px;
+  }
+  .feature-card-about .fc-desc {
+    font-size: 13px; color: var(--text-sub); line-height: 1.6;
+  }
+  .platform-row {
+    display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;
+  }
+  .plat-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 14px; font-size: 13px; color: var(--text);
+  }
+  .info-table {
+    width: 100%; border-collapse: collapse; margin-top: 12px;
+  }
+  .info-table th, .info-table td {
+    text-align: left; padding: 10px 12px; font-size: 14px; border-bottom: 1px solid var(--border-light);
+  }
+  .info-table th {
+    color: var(--text); font-weight: 600; width: 140px; background: var(--bg);
+  }
+  .info-table td { color: var(--text-sub); }
+  .placeholder {
+    color: var(--text-light); font-style: italic;
+  }
+  .disclaimer-box {
+    background: #fff8e6; border-left: 3px solid #f5a623; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 16px 20px; margin-top: 16px;
+  }
+  .disclaimer-box p { font-size: 13px; color: #8a6d3b; line-height: 1.7; margin: 0; }
+  .contact-row {
+    display: flex; flex-wrap: wrap; gap: 24px; margin-top: 16px;
+  }
+  .contact-item {
+    display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-sub);
+  }
+  .contact-item .ci-ico { font-size: 16px; }
+
+  @media (max-width: 768px) {
+    .about-hero { padding: 32px 0 20px; }
+    .about-hero h1 { font-size: 22px; }
+    .about-section { padding: 20px 18px; }
+    .feature-grid-about { grid-template-columns: 1fr; }
+    .contact-row { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-logo">⬇</span>
+      <span class="brand-name">应用分发中心</span>
+    </a>
+    <nav class="nav">
+      <a href="/">首页</a>
+      <a href="/developer">开发接入</a>
+      <a href="/about" class="active">关于程序</a>
+      <a href="/admin" target="_blank" rel="noopener" class="btn-primary-nav">管理后台</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- 平台定位与简介 -->
+  <section class="about-hero">
+    <h1>官方应用发布与升级分发平台</h1>
+    <p class="about-sub">
+      企业级应用发布与升级分发平台，覆盖应用全生命周期管理、多渠道分发、灰度发布、版本控制与运维监控。
+      为开发团队提供安全稳定的应用下载通道，支持 Android、iOS、Windows、macOS、Linux、HarmonyOS 全平台分发。
+    </p>
+  </section>
+
+  <!-- 开发方介绍 -->
+  <section class="about-section">
+    <h2><span class="sec-ico">🏢</span>开发方</h2>
+    <p><strong>沧州虎王科技</strong> —— 专注于企业级软件基础设施研发，致力于为企业提供安全、稳定、高效的应用分发与版本管理解决方案。</p>
+    <table class="info-table">
+      <tr><th>开发者</th><td>沧州虎王科技</td></tr>
+      <tr><th>产品名称</th><td>PHP App 发布 / 升级分发平台</td></tr>
+      <tr><th>版本号</th><td>V1.0</td></tr>
+      <tr><th>更新时间</th><td><span class="placeholder">[待填写]</span></td></tr>
+      <tr><th>技术栈</th><td>ThinkPHP 8.1 + MySQL 8.0 / SQLite + LayUI 2.x</td></tr>
+    </table>
+  </section>
+
+  <!-- 核心特性 -->
+  <section class="about-section">
+    <h2><span class="sec-ico">⭐</span>核心特性</h2>
+    <div class="feature-grid-about">
+      <div class="feature-card-about">
+        <span class="fc-ico">🛡</span>
+        <div class="fc-title">下载安全校验</div>
+        <div class="fc-desc">所有安装包经 MD5 / SHA1 / SHA256 多重哈希校验，APK/IPA 签名指纹提取与验证，确保分发包的完整性与来源可信。</div>
+      </div>
+      <div class="feature-card-about">
+        <span class="fc-ico">🌐</span>
+        <div class="fc-title">稳定分发</div>
+        <div class="fc-desc">支持全量 / 灰度 / 定向 / A/B 实验分组发布，按设备/用户/渠道/百分比精准投放，一键回滚与暂停，保障升级稳定性。</div>
+      </div>
+      <div class="feature-card-about">
+        <span class="fc-ico">🔄</span>
+        <div class="fc-title">版本发布与升级机制</div>
+        <div class="fc-desc">智能更新检测引擎：按应用→版本号→平台/架构→渠道→最低版本→灰度规则→设备→实验组 决策链，精准推送可用版本。</div>
+      </div>
+      <div class="feature-card-about">
+        <span class="fc-ico">📊</span>
+        <div class="fc-title">全链路监控</div>
+        <div class="fc-desc">下载统计、留存分析、漏斗分析、实时数据看板、性能监控与崩溃上报符号化，数据驱动版本迭代。</div>
+      </div>
+      <div class="feature-card-about">
+        <span class="fc-ico">🔐</span>
+        <div class="fc-title">访问控制</div>
+        <div class="fc-desc">下载密码保护、访问类型控制（公开/密码/白名单）、邀请链接管理、测试人员群组，多维度管控分发权限。</div>
+      </div>
+      <div class="feature-card-about">
+        <span class="fc-ico">🚀</span>
+        <div class="fc-title">增量更新</div>
+        <div class="fc-desc">服务端 bsdiff 差分包自动生成，客户端合并还原，显著降低升级流量消耗，提升大版本迭代效率。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 全平台支持 -->
+  <section class="about-section">
+    <h2><span class="sec-ico">📱</span>全平台支持</h2>
+    <p>平台支持主流操作系统与架构，覆盖移动端、桌面端及国产操作系统：</p>
+    <div class="platform-row">
+      <span class="plat-chip">🌐 HarmonyOS</span>
+      <span class="plat-chip">🤖 Android</span>
+      <span class="plat-chip">🍎 iOS</span>
+      <span class="plat-chip">🪟 Windows</span>
+      <span class="plat-chip">🖥️ macOS</span>
+      <span class="plat-chip">🐧 Linux</span>
+    </div>
+    <ul style="margin-top:14px;">
+      <li><strong>移动端：</strong>Android（APK）、iOS（IPA / itms-services 企业分发）、HarmonyOS（HAP / APP）</li>
+      <li><strong>桌面端：</strong>Windows（EXE / ZIP）、macOS（DMG / ZIP）、Linux（AppImage / BIN / TAR）</li>
+      <li><strong>架构适配：</strong>支持按设备架构（arm64 / x86 / x86_64 等）精准匹配安装包</li>
+      <li><strong>SDK 接入：</strong>提供 Android（Java）与 iOS（Swift）应用内更新 SDK，封装更新检测、下载、安装全流程</li>
+    </ul>
+  </section>
+
+  <!-- 下载与使用指引 -->
+  <section class="about-section">
+    <h2><span class="sec-ico">📖</span>下载与使用指引</h2>
+    <ul>
+      <li><strong>前台下载：</strong>访问首页或应用专属下载页，选择对应平台后获取安装包或扫码下载。</li>
+      <li><strong>版本历史：</strong>在应用下载页点击「历史版本」，查看并下载过往已发布的正式版本。</li>
+      <li><strong>API 接入：</strong>开发者可阅读「开发接入」文档，按 app_code 接入更新检测、反馈上报、崩溃上报等标准接口。</li>
+      <li><strong>后台管理：</strong>管理员通过「管理后台」进行应用创建、安装包上传、版本发布、渠道配置、统计查看与权限管控。</li>
+      <li><strong>安全提醒：</strong>下载后请核对版本号、平台与文件哈希是否与页面展示一致；发现异常请通过 App 内反馈通道联系我们。</li>
+    </ul>
+  </section>
+
+  <!-- 免责声明 -->
+  <section class="about-section">
+    <h2><span class="sec-ico">⚠</span>免责声明</h2>
+    <div class="disclaimer-box">
+      <p>
+        本平台上发布的所有应用安装包均由开发者或管理员上传并负责其内容与合法性。平台仅提供分发通道与技术基础设施，不对应用本身的功能、质量、安全性及使用后果承担任何责任。
+        用户在下载、安装或使用任何应用前，应自行评估风险并遵守相关法律法规及最终用户许可协议。
+        如应用涉及侵权、违法或其他不当内容，请及时通过下方联系方式反馈，平台将按相关规则处理。
+      </p>
+    </div>
+  </section>
+
+  <!-- 联系方式 -->
+  <section class="about-section">
+    <h2><span class="sec-ico">📞</span>联系方式</h2>
+    <div class="contact-row">
+      <div class="contact-item"><span class="ci-ico">📧</span> 邮箱：<span class="placeholder">[待填写]</span></div>
+      <div class="contact-item"><span class="ci-ico">📱</span> 电话：<span class="placeholder">[待填写]</span></div>
+      <div class="contact-item"><span class="ci-ico">🏢</span> 地址：<span class="placeholder">[待填写]</span></div>
+      <div class="contact-item"><span class="ci-ico">🌐</span> 官网：<span class="placeholder">[待填写]</span></div>
+    </div>
+    <p style="margin-top:16px; font-size:13px; color:var(--text-light);">
+      © 2026 沧州虎王科技 · 应用分发中心 V1.0 · 保留所有权利
+    </p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 沧州虎王科技 · 应用分发中心 · <a href="/">首页</a> · <a href="/developer">开发接入</a> · <a href="/about">关于程序</a> · <a href="/admin" target="_blank" rel="noopener">管理后台</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
